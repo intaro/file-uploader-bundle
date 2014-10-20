@@ -1,2 +1,1 @@
-file-uploader-bundle
-====================
+# File Uploader Bundle
