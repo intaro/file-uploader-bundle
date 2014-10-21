@@ -1,6 +1,7 @@
 {
     "name": "intaro/file-uplodaer-bundle",
     "type": "symfony-bundle",
+    "license": "MIT",
     "autoload": {
         "psr-0": {
             "Intaro\\FileUploaderBundle\\": ""
