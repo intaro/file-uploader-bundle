@@ -1,0 +1,10 @@
+{
+    "name": "intaro/file-uplodaer-bundle",
+    "type": "symfony-bundle",
+    "autoload": {
+        "psr-0": {
+            "Intaro\\FileUploaderBundle\\": ""
+        }
+    },
+    "target-dir" : "Intaro/FileUploaderBundle"
+}
