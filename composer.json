@@ -9,6 +9,9 @@
             "email": "mail@intaro.ru"
         }
     ],
+    "require": {
+        "knplabs/knp-gaufrette-bundle": "~0.1.7"
+    },
     "autoload": {
         "psr-0": {
             "Intaro\\FileUploaderBundle\\": ""
