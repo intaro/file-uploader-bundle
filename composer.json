@@ -1,7 +1,7 @@
 {
     "name": "intaro/file-uploader-bundle",
     "type": "symfony-bundle",
-    "keywords": ["symfony2", "file upload"]
+    "keywords": ["symfony2", "file upload"],
     "license": "MIT",
     "authors": [
         {
