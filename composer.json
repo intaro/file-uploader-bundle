@@ -1,7 +1,14 @@
 {
-    "name": "intaro/file-uplodaer-bundle",
+    "name": "intaro/file-uploader-bundle",
     "type": "symfony-bundle",
+    "keywords": ["symfony2", "file upload"]
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Intaro Soft",
+            "email": "mail@intaro.ru"
+        }
+    ],
     "autoload": {
         "psr-0": {
             "Intaro\\FileUploaderBundle\\": ""
