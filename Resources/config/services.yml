@@ -1,1 +1,2 @@
-
+parameters:
+    intaro_file_uploader.class: Intaro\FileUploaderBundle\Services\FileUploader
