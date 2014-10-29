@@ -61,23 +61,23 @@ In configs:
                 create: true
                 allowed_types: ['application/pdf', 'application/rtf', 'application/vnd.ms-office']
         aws_s3:
-            amazon:
-                  service_id: aws.client_service_name
-                  bucket_name: some_bucket
-                  options:
-                      directory: path/to/attach/dir
-                      create: true
-                      acl: public-read
+            video:
+                service_id: aws.client_service_name
+                bucket_name: some_bucket
+                options:
+                    directory: path/to/attach/dir
+                    create: true
+                    acl: public-read
   ```
   
-  In controller:
+  In code:
   ```php
   
   public function uploadAction()
   {
       $files = $this->getRequest()->files->get('file');
       
-      $uploader = $this->container->get('intaro.amazon_uploader');
+      $uploader = $this->container->get('intaro.video_uploader');
       
       $newName = $uploader->upload($file);
   }
