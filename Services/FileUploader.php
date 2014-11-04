@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Adapter\Local;
+use Gaufrette\Adapter\AwsS3;
 
 /**
  * Class FileUploader
@@ -117,6 +118,19 @@ class FileUploader
         }
 
         return $filename;
+    }
+    
+    public function remove($name)
+    {
+        return $this->filesystem->delete($name);
+    }
+    
+    public function getUrl($name)
+    {
+        $adapter = $this->filesystem->getAdapter();
+        if ($adapter instanceof AwsS3) {
+           return $adapter->getUrl($name);
+        }
     }
 
     /**

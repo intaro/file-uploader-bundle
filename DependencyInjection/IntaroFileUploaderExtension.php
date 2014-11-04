@@ -20,19 +20,35 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         $gaufretteConfig = $this->generateGaufretteConfig($config);
         $container->prependExtensionConfig('knp_gaufrette', $gaufretteConfig);
 
-        foreach ($config['uploaders'] as $uploaderType => $uploaders) {
-            foreach ($uploaders as $name => $options) {
-                $container->setDefinition("intaro.{$name}_uploader",
-                    new Definition(
-                    '%intaro_file_uploader.class%',
-                    [
-                        new Reference("gaufrette.{$name}_filesystem"),
-                        $options['directory'],
-                        $options['allowed_types']
-                    ]
-                ));
+        
+            foreach ($config['uploaders'] as $uploaderType => $uploaders) {
+                if($uploaderType === 'local'){
+                    foreach ($uploaders as $name => $options) {
+                        $container->setDefinition("intaro.{$name}_uploader",
+                            new Definition(
+                            '%intaro_file_uploader.class%',
+                            [
+                                new Reference("gaufrette.{$name}_filesystem"),
+                                $options['directory'],
+                                $options['allowed_types']
+                            ]
+                        ));
+                    }
+                } elseif ($uploaderType === 'aws_s3'){
+                        foreach ($uploaders as $name => $options) {
+                            $container->setDefinition("intaro.{$name}_uploader",
+                                new Definition(
+                                '%intaro_file_uploader.class%',
+                                [
+                                    new Reference("gaufrette.{$name}_filesystem"),
+                                    $options['options']['directory'],
+                                    null
+                                ]
+                            ));
+                        }
+                }
             }
-        }
+       
     }
 
     public function load(array $configs, ContainerBuilder $container)
