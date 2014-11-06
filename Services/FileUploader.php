@@ -17,17 +17,19 @@ class FileUploader
     private $filesystem;
     private $path;
     private $allowedTypes;
+    private $container;
 
     /**
      * Constructor
      *
      * @param mixed $container app container
      */
-    public function __construct(Filesystem $filesystem, $path, $allowedTypes)
+    public function __construct(Filesystem $filesystem, $container, $path, $allowedTypes)
     {
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
+        $this->container = $container;
     }
 
     /**
@@ -119,17 +121,26 @@ class FileUploader
 
         return $filename;
     }
-    
+
     public function remove($name)
     {
         return $this->filesystem->delete($name);
     }
-    
+
     public function getUrl($name)
     {
         $adapter = $this->filesystem->getAdapter();
         if ($adapter instanceof AwsS3) {
-           return $adapter->getUrl($name);
+            return $adapter->getUrl($name);
+        } elseif ($adapter instanceof Local) {
+            return sprintf(
+                '%s://%s.%s/%s/%s',
+                $this->container->getParameter('router.request_context.scheme'),
+                $this->container->getParameter('crm_name'),
+                $this->container->getParameter('router.request_context.domain'),
+                $this->getWebPath(),
+                $name
+            );
         }
     }
 
@@ -217,10 +228,12 @@ class FileUploader
         return $this->path;
     }
 
-    public function setPath($path)
+    public function getWebpath()
     {
-        $this->path = $path;
+        $webRoot = realpath($this->container->get('kernel')->getRootDir().'/../web');
+        $path = realpath($this->getPath());
+        $webPath = substr($path, strpos($path, $webRoot) + strlen($webRoot));
 
-        return $this;
+        return trim($webPath, '/');
     }
 }
