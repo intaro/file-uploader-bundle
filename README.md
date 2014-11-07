@@ -2,7 +2,7 @@
 
 ## About ##
 
-This is symfony2 bundle. The purpose of this bundle is to simplify the file uploading process.
+This is Symfony2 bundle. The purpose of this bundle is to simplify the file uploading process.
 It moves files to storage after they were uploaded into temporary folder.
 
 There are few supported storage types:
@@ -77,9 +77,7 @@ In configs:
   {
       $files = $this->getRequest()->files->get('file');
       
-      $uploader = $this->container->get('intaro.video_uploader');
-      
-      $newName = $uploader->upload($file);
+      $this->get('intaro.video_uploader')->upload($file);
   }
     
   ```
