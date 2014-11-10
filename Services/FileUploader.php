@@ -133,14 +133,31 @@ class FileUploader
         if ($adapter instanceof AwsS3) {
             return $adapter->getUrl($name);
         } elseif ($adapter instanceof Local) {
+            $context = $this->container->get('router')->getContext();
+
             return sprintf(
-                '%s://%s.%s/%s/%s',
-                $this->container->getParameter('router.request_context.scheme'),
-                $this->container->getParameter('crm_name'),
-                $this->container->getParameter('router.request_context.domain'),
+                '%s://%s/%s/%s',
+                $context->getScheme(),
+                $context->getHost(),
                 $this->getWebPath(),
                 $name
             );
+        }
+    }
+
+    public function listFiles()
+    {
+        $adapter = $this->filesystem->getAdapter();
+        if ($adapter instanceof AwsS3) {
+            return $this->filesystem->listKeys();
+        } elseif ($adapter instanceof Local) {
+            $files = $this->filesystem->listKeys();
+            $pathnames = [];
+            foreach($files['keys'] as $file){
+                $pathnames[] = $this->getWebpath().'/'.$file;
+            }
+
+            return $pathnames;
         }
     }
 
