@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Adapter\Local;
 use Gaufrette\Adapter\AwsS3;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class FileUploader
@@ -17,19 +18,26 @@ class FileUploader
     private $filesystem;
     private $path;
     private $allowedTypes;
-    private $container;
+    private $webDir;
+    private $router;
 
     /**
      * Constructor
      *
      * @param mixed $container app container
      */
-    public function __construct(Filesystem $filesystem, $container, $path, $allowedTypes)
-    {
+    public function __construct(
+        Filesystem $filesystem,
+        RouterInterface $router,
+        $path,
+        $webDir,
+        $allowedTypes
+    ) {
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
-        $this->container = $container;
+        $this->router = $router;
+        $this->webDir = $webDir;
     }
 
     /**
@@ -133,7 +141,7 @@ class FileUploader
         if ($adapter instanceof AwsS3) {
             return $adapter->getUrl($name);
         } elseif ($adapter instanceof Local) {
-            $context = $this->container->get('router')->getContext();
+            $context = $this->router->getContext();
 
             return sprintf(
                 '%s://%s/%s/%s',
@@ -245,9 +253,9 @@ class FileUploader
         return $this->path;
     }
 
-    public function getWebpath()
+    public function getWebPath()
     {
-        $webRoot = realpath($this->container->get('kernel')->getRootDir().'/../web');
+        $webRoot = realpath($this->webDir);
         $path = realpath($this->getPath());
         $webPath = substr($path, strpos($path, $webRoot) + strlen($webRoot));
 
