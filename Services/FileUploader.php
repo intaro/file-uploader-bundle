@@ -266,11 +266,4 @@ class FileUploader
     {
         return $this->allowedTypes;
     }
-
-    public function setAllowedTypes($allowedTypes)
-    {
-        $this->allowedTypes = $allowedTypes;
-
-        return $this;
-    }
 }
