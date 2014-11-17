@@ -261,4 +261,16 @@ class FileUploader
 
         return trim($webPath, '/');
     }
+
+    public function getAllowedTypes()
+    {
+        return $this->allowedTypes;
+    }
+
+    public function setAllowedTypes($allowedTypes)
+    {
+        $this->allowedTypes = $allowedTypes;
+
+        return $this;
+    }
 }
