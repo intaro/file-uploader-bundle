@@ -22,11 +22,6 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
 
         foreach ($config['uploaders'] as $uploaderType => $uploaders) {
             foreach ($uploaders as $name => $options) {
-                if($uploaderType === 'local'){
-                    $directory = $options['directory'];
-                } elseif ($uploaderType === 'aws_s3') {
-                    $directory = $options['options']['directory'];
-                }
                 $container->setDefinition("intaro.{$name}_uploader",
                     new Definition(
                     '%intaro_file_uploader.class%',
@@ -34,7 +29,6 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
                         new Reference("gaufrette.{$name}_filesystem"),
                         new Reference("router"),
                         $options['path'],
-                        '%kernel.root_dir%/../web',
                         $options['allowed_types']
                     ]
                 ));

@@ -18,7 +18,6 @@ class FileUploader
     private $filesystem;
     private $path;
     private $allowedTypes;
-    private $webDir;
     private $router;
 
     /**
@@ -30,14 +29,12 @@ class FileUploader
         Filesystem $filesystem,
         RouterInterface $router,
         $path,
-        $webDir,
         $allowedTypes
     ) {
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
         $this->router = $router;
-        $this->webDir = $webDir;
     }
 
     /**
@@ -137,20 +134,7 @@ class FileUploader
 
     public function getUrl($name)
     {
-        $adapter = $this->filesystem->getAdapter();
-        if ($adapter instanceof AwsS3) {
-            return $adapter->getUrl($name);
-        } elseif ($adapter instanceof Local) {
-            $context = $this->router->getContext();
-
-            return sprintf(
-                '%s://%s/%s/%s',
-                $context->getScheme(),
-                $context->getHost(),
-                $this->getWebPath(),
-                $name
-            );
-        }
+        return $this->getPath().$name;
     }
 
     public function listFiles()
@@ -251,15 +235,6 @@ class FileUploader
     public function getPath()
     {
         return $this->path;
-    }
-
-    public function getWebPath()
-    {
-        $webRoot = realpath($this->webDir);
-        $path = realpath($this->getPath());
-        $webPath = substr($path, strpos($path, $webRoot) + strlen($webRoot));
-
-        return trim($webPath, '/');
     }
 
     public function getAllowedTypes()
