@@ -53,7 +53,7 @@ In configs:
     uploaders:
         local:
             image:
-                directory: path/to/attach/dir
+                path: http://www.app.local/images/
                 create: true
                 allowed_types: ['image/jpeg', 'image/png', 'image/gif']
             document:
@@ -63,9 +63,9 @@ In configs:
         aws_s3:
             video:
                 service_id: aws.client_service_name
+                path: https://s3-us-west-2.amazonaws.com/bucket-name/iamges/
                 bucket_name: some_bucket
                 options:
-                    directory: path/to/attach/dir
                     create: true
                     acl: public-read
   ```
