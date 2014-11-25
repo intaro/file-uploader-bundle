@@ -33,7 +33,7 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
                     [
                         new Reference("gaufrette.{$name}_filesystem"),
                         new Reference("router"),
-                        $directory,
+                        $options['path'],
                         '%kernel.root_dir%/../web',
                         $options['allowed_types']
                     ]
@@ -57,7 +57,10 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         $adapters = [];
         foreach (array_filter($config['uploaders']) as $uploaderType => $uploaders) {
             foreach ($uploaders as $name => $options) {
-                unset($options['allowed_types']);
+                unset(
+                    $options['allowed_types'],
+                    $options['path']
+                );
                 $filesystems[$name] = [
                     'adapter' => $name
                 ];
