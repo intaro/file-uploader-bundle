@@ -45,7 +45,7 @@ $ composer update intaro/file-uploader-bundle
 
 ## Usage ##
 
-In configs:
+In config:
 ``` yml
   # app/config/config.yml
   
