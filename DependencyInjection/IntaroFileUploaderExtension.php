@@ -54,7 +54,7 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         $filesystems = [];
         $adapters = [];
         
-        if (!isset($config['uploaders'])) {
+        if (isset($config['uploaders'])) {
             foreach (array_filter($config['uploaders']) as $uploaderType => $uploaders) {
                 foreach ($uploaders as $name => $options) {
                     unset(
