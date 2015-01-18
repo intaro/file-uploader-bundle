@@ -20,6 +20,10 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         $gaufretteConfig = $this->generateGaufretteConfig($config);
         $container->prependExtensionConfig('knp_gaufrette', $gaufretteConfig);
 
+        if (!isset($config['uploaders'])) {
+            return;
+        }
+
         foreach ($config['uploaders'] as $uploaderType => $uploaders) {
             foreach ($uploaders as $name => $options) {
                 $container->setDefinition("intaro.{$name}_uploader",
