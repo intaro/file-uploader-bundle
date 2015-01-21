@@ -140,19 +140,22 @@ class FileUploader
     public function listFiles()
     {
         $files = [];
+        $keys = $this->filesystem->listKeys();
         $adapter = $this->filesystem->getAdapter();
         if ($adapter instanceof AwsS3) {
-            foreach($this->filesystem->listKeys() as $file) {
-                $parts = explode('/', $file);
-                $filename = end($parts);
-                if ($filename) {
-                    $files[] = $this->getPath().$filename;
+            if (sizeof($keys) > 0) {
+                foreach ($keys as $file) {
+                    $filename = basename($file);
+                    if ($filename) {
+                        $files[] = $this->getPath().$filename;
+                    }
                 }
             }
         } elseif ($adapter instanceof Local) {
-            $keys = $this->filesystem->listKeys();
-            foreach($keys['keys'] as $file) {
-                $files[] = $this->getPath().$file;
+            if (isset($keys['keys']) && sizeof($keys) > 0) {
+                foreach ($keys['keys'] as $file) {
+                    $files[] = $this->getPath().$file;
+                }
             }
         }
 
