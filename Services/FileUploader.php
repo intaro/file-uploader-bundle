@@ -152,7 +152,7 @@ class FileUploader
                 }
             }
         } elseif ($adapter instanceof Local) {
-            if (isset($keys['keys']) && sizeof($keys) > 0) {
+            if (isset($keys['keys']) && sizeof($keys['keys']) > 0) {
                 foreach ($keys['keys'] as $file) {
                     $files[] = $this->getPath().$file;
                 }
