@@ -199,7 +199,7 @@ class FileUploader
 
         $cyr = array_map(
             function ($elem) {
-                self::utf2win($elem);
+                return self::utf2win($elem);
             },
             [
                 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м',
