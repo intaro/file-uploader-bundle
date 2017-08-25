@@ -47,7 +47,7 @@ class FileUploader
      */
     public function upload(UploadedFile $file)
     {
-        $fileMimeType = $file->getClientMimeType();
+        $fileMimeType = $file->getMimeType();
         if ($this->allowedTypes && !in_array($fileMimeType, $this->allowedTypes)) {
             throw new \InvalidArgumentException(
                 sprintf('Files of type %s are not allowed.', $fileMimeType)
