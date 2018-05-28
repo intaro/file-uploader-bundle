@@ -171,7 +171,7 @@ class FileUploader
      */
     private static function win2utf($s)
     {
-        return iconv('cp1251', 'utf-8', $s);
+        return iconv('cp1251', 'utf-8//IGNORE', $s);
     }
 
     /**
@@ -183,7 +183,7 @@ class FileUploader
      */
     private static function utf2win($s)
     {
-        return iconv('utf-8', 'cp1251', $s);
+        return iconv('utf-8', 'cp1251//IGNORE', $s);
     }
 
     /**
