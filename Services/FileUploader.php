@@ -19,6 +19,7 @@ class FileUploader
     private $path;
     private $allowedTypes;
     private $router;
+    private $translator;
 
     /**
      * Constructor
@@ -35,6 +36,7 @@ class FileUploader
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
         $this->router = $router;
+        $this->translator = \Transliterator::create('Any-Latin;Latin-ASCII;Lower;[\u0080-\u7fff] remove');
     }
 
     /**
@@ -84,7 +86,7 @@ class FileUploader
             preg_replace(
                 '/\s+/',
                 '-',
-                $this->translit($originalName)
+                $this->translator->transliterate($originalName)
             )
         );
     }
@@ -160,73 +162,6 @@ class FileUploader
         }
 
         return $files;
-    }
-
-    /**
-     * Encode windows to utf-8
-     *
-     * @param object $s string for encoding
-     *
-     * @return string
-     */
-    private static function win2utf($s)
-    {
-        return iconv('cp1251', 'utf-8//IGNORE', $s);
-    }
-
-    /**
-     * Encode utf-8 to windows
-     *
-     * @param string $s string for encoding
-     *
-     * @return string
-     */
-    private static function utf2win($s)
-    {
-        return iconv('utf-8', 'cp1251//IGNORE', $s);
-    }
-
-    /**
-     * Return ru-en translited string
-     *
-     * @param string $var message string for transliteration
-     *
-     * @return string
-     */
-    public function translit($var)
-    {
-        $var = strtolower(trim(self::utf2win($var)));
-
-        $cyr = array_map(
-            function ($elem) {
-                return self::utf2win($elem);
-            },
-            [
-                'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м',
-                'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ',
-                'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З',
-                'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х',
-                'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'
-            ]
-        );
-
-        $lat = [
-            'a', 'b', 'v', 'g', 'd', 'e', 'e', 'zh', 'z', 'i', 'y', 'k', 'l', 'm',
-            'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', 'ch', 'sh', 'sch', '',
-            'y', '', 'e', 'yu', 'ya', 'a', 'b', 'v', 'g', 'd', 'e', 'e', 'zh', 'z',
-            'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h',
-            'c', 'ch', 'sh', 'sz', '', 'y', '', 'e', 'yu', 'ya'
-        ];
-
-        $var = str_replace($cyr, $lat, $var);
-        $var = str_replace('-', ' ', $var);
-        $var = str_replace('/', ' ', $var);
-
-        $var = preg_replace('/[^a-z0-9-\.]+/', ' ', $var);
-        $var = preg_replace('/(\s+)/', '-', trim($var));
-        $var = self::win2utf($var);
-
-        return $var;
     }
 
     public function getFilesystem()
