@@ -83,11 +83,32 @@ class FileUploader
         return sprintf(
             '%s-%s',
             uniqid(),
-            preg_replace(
-                '/\s+/',
-                '-',
-                $this->translator->transliterate($originalName)
-            )
+            $this->clearName($originalName)
+        );
+    }
+
+    /**
+     * Name cleanup
+     * @param $originalName
+     * @return string
+     */
+    protected function clearName($originalName)
+    {
+        //basic check on URL encoding
+        if (urldecode($originalName) !== $originalName) {
+            $originalName = urldecode($originalName);
+        }
+
+        $originalName = preg_replace(
+            '/[\+\\/\%]+/',
+            '_',
+            $originalName
+        );
+
+        return preg_replace(
+            '/\s+/',
+            '-',
+            $this->translator->transliterate($originalName)
         );
     }
 
