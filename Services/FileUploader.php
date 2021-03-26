@@ -100,7 +100,7 @@ class FileUploader
         }
 
         $originalName = preg_replace(
-            '/[\+\\/\%\#\?]+/',
+            '/[\+\\/\\\\\%\#\?\"\'\`]+/',
             '_',
             $originalName
         );
