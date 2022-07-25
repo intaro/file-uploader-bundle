@@ -3,7 +3,6 @@
 namespace Intaro\FileUploaderBundle\Services;
 
 use Gaufrette\Adapter\AwsS3;
-use Symfony\Component\Routing\RouterInterface;
 use Gaufrette\Adapter\Local;
 use Gaufrette\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    private $router;
     private Filesystem $filesystem;
     private string $path;
     private ?array $allowedTypes;
@@ -19,14 +17,12 @@ class FileUploader
 
     public function __construct(
         Filesystem $filesystem,
-        RouterInterface $router,
         string $path,
         array $allowedTypes
     ) {
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
-        $this->router = $router;
         $this->translator = \Transliterator::create('Any-Latin;Latin-ASCII;Lower;[\u0080-\u7fff] remove');
     }
 

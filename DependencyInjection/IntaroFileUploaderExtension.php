@@ -31,7 +31,6 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
                     '%intaro_file_uploader.class%',
                     [
                         new Reference("gaufrette.{$name}_filesystem"),
-                        new Reference("router"),
                         $options['path'],
                         $options['allowed_types'],
                     ]
