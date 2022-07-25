@@ -11,7 +11,8 @@
         }
     ],
     "require": {
-        "knplabs/knp-gaufrette-bundle": "~0.3"
+        "knplabs/knp-gaufrette-bundle": "~0.3",
+        "php": "^7.4"
     },
     "autoload": {
         "psr-0": {

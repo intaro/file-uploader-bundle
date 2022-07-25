@@ -2,17 +2,17 @@
 
 namespace Intaro\FileUploaderBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class IntaroFileUploaderExtension extends Extension implements PrependExtensionInterface
 {
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $configs = $container->getExtensionConfig($this->getAlias());
         $config = $this->processConfiguration(new Configuration(), $configs);
@@ -33,19 +33,19 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
                         new Reference("gaufrette.{$name}_filesystem"),
                         new Reference("router"),
                         $options['path'],
-                        $options['allowed_types']
+                        $options['allowed_types'],
                     ]
                 ));
             }
         }
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
     }
 
@@ -53,7 +53,7 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
     {
         $filesystems = [];
         $adapters = [];
-        
+
         if (isset($config['uploaders'])) {
             foreach (array_filter($config['uploaders']) as $uploaderType => $uploaders) {
                 foreach ($uploaders as $name => $options) {
@@ -62,18 +62,18 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
                         $options['path']
                     );
                     $filesystems[$name] = [
-                        'adapter' => $name
+                        'adapter' => $name,
                     ];
                     $adapters[$name] = [
-                        $uploaderType => $options
+                        $uploaderType => $options,
                     ];
                 }
             }
         }
-        
+
         $gaufretteConfig = [
             'adapters' => $adapters,
-            'filesystems' => $filesystems
+            'filesystems' => $filesystems,
         ];
 
         return $gaufretteConfig;
