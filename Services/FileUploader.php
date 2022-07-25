@@ -1,53 +1,35 @@
 <?php
+
 namespace Intaro\FileUploaderBundle\Services;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\File;
-use Gaufrette\Filesystem;
-use Gaufrette\Adapter\Local;
 use Gaufrette\Adapter\AwsS3;
-use Symfony\Component\Routing\RouterInterface;
+use Gaufrette\Adapter\Local;
+use Gaufrette\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- * Class FileUploader
- *
- * @package Intaro\FileUploaderBundle\Services
- */
 class FileUploader
 {
-    private $filesystem;
-    private $path;
-    private $allowedTypes;
-    private $router;
-    private $translator;
+    private Filesystem $filesystem;
+    private string $path;
+    private ?array $allowedTypes;
+    private \Transliterator $translator;
 
-    /**
-     * Constructor
-     *
-     * @param mixed $container app container
-     */
     public function __construct(
         Filesystem $filesystem,
-        RouterInterface $router,
-        $path,
-        $allowedTypes
+        string $path,
+        array $allowedTypes
     ) {
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
-        $this->router = $router;
         $this->translator = \Transliterator::create('Any-Latin;Latin-ASCII;Lower;[\u0080-\u7fff] remove');
     }
 
     /**
-     * Upload method
-     *
-     * @param UploadedFile $file file to upload
-     *
-     * @return string
      * @throws \InvalidArgumentException
      */
-    public function upload(UploadedFile $file)
+    public function upload(UploadedFile $file): string
     {
         $fileMimeType = $file->getMimeType();
         if ($this->allowedTypes && !in_array($fileMimeType, $this->allowedTypes)) {
@@ -72,55 +54,7 @@ class FileUploader
         return $filename;
     }
 
-    /**
-     * Generate new filename based on original name
-     *
-     * @param  string $originalName
-     * @return string
-     */
-    public function generateNameByOriginal($originalName)
-    {
-        return sprintf(
-            '%s-%s',
-            uniqid(),
-            $this->clearName($originalName)
-        );
-    }
-
-    /**
-     * Name cleanup
-     * @param $originalName
-     * @return string
-     */
-    protected function clearName($originalName)
-    {
-        //basic check on URL encoding
-        if (urldecode($originalName) !== $originalName) {
-            $originalName = urldecode($originalName);
-        }
-
-        $originalName = preg_replace(
-            '/[\+\\/\%\#\?]+/',
-            '_',
-            $originalName
-        );
-
-        return preg_replace(
-            '/\s+/',
-            '-',
-            $this->translator->transliterate($originalName)
-        );
-    }
-
-    /**
-     * Upload local file to storage
-     *
-     * @access public
-     * @param  mixed  $pathname
-     * @param  bool   $unlinkAfterUpload (default: true)
-     * @return string
-     */
-    public function uploadByPath($pathname, $unlinkAfterUpload = true)
+    public function uploadByPath(string $pathname, bool $unlinkAfterUpload = true): string
     {
         $file = new File($pathname);
         $filename = $file->getBasename();
@@ -150,34 +84,86 @@ class FileUploader
         return $filename;
     }
 
-    public function remove($name)
+    public function uploadByContent(string $fileContent, string $filename, string $mimeType): string
+    {
+        if ($this->allowedTypes && !in_array($mimeType, $this->allowedTypes)) {
+            throw new \InvalidArgumentException(
+                sprintf('Files of type %s are not allowed.', $mimeType)
+            );
+        }
+
+        $adapter = $this->filesystem->getAdapter();
+
+        if (!($adapter instanceof Local)) {
+            $adapter->setMetadata(
+                $filename,
+                ['contentType' => $mimeType]
+            );
+        }
+
+        $adapter->write($filename, $fileContent);
+
+        return $filename;
+    }
+
+    public function generateNameByOriginal(string $originalName): string
+    {
+        return sprintf(
+            '%s-%s',
+            uniqid(),
+            $this->clearName($originalName)
+        );
+    }
+
+    protected function clearName(string $originalName): string
+    {
+        //basic check on URL encoding
+        if (urldecode($originalName) !== $originalName) {
+            $originalName = urldecode($originalName);
+        }
+
+        $originalName = preg_replace(
+            '/[\+\\/\%\#\?]+/',
+            '_',
+            $originalName
+        );
+
+        return preg_replace(
+            '/\s+/',
+            '-',
+            $this->translator->transliterate($originalName)
+        );
+    }
+
+    public function remove($name): bool
     {
         return $this->filesystem->delete($name);
     }
 
-    public function getUrl($name)
+    public function getUrl($name): string
     {
-        return $this->getPath().$name;
+        return $this->getPath() . $name;
     }
 
-    public function listFiles()
+    /** @return string[] */
+    public function listFiles(): array
     {
         $files = [];
         $keys = $this->filesystem->listKeys();
         $adapter = $this->filesystem->getAdapter();
         if ($adapter instanceof AwsS3) {
-            if (sizeof($keys) > 0) {
+            if (count($keys) > 0) {
                 foreach ($keys as $file) {
                     $filename = basename($file);
                     if ($filename) {
-                        $files[] = $this->getPath().$filename;
+                        $files[] = $this->getPath() . $filename;
                     }
                 }
             }
         } elseif ($adapter instanceof Local) {
-            if (isset($keys['keys']) && sizeof($keys['keys']) > 0) {
+            if (isset($keys['keys']) && count($keys['keys']) > 0) {
                 foreach ($keys['keys'] as $file) {
-                    $files[] = $this->getPath().$file;
+                    $files[] = $this->getPath() . $file;
                 }
             }
         }
@@ -185,24 +171,24 @@ class FileUploader
         return $files;
     }
 
-    public function getFilesystem()
+    public function getFilesystem(): Filesystem
     {
         return $this->filesystem;
     }
 
-    public function setFilesystem($filesystem)
+    public function setFilesystem(Filesystem $filesystem): self
     {
         $this->filesystem = $filesystem;
 
         return $this;
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    public function getAllowedTypes()
+    public function getAllowedTypes(): ?array
     {
         return $this->allowedTypes;
     }
