@@ -15,9 +15,8 @@
         "php": "^7.4"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Intaro\\FileUploaderBundle\\": ""
         }
-    },
-    "target-dir" : "Intaro/FileUploaderBundle"
+    }
 }

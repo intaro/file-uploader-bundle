@@ -84,6 +84,27 @@ class FileUploader
         return $filename;
     }
 
+    public function uploadByContent(string $fileContent, string $filename, string $mimeType): string
+    {
+        if ($this->allowedTypes && !in_array($mimeType, $this->allowedTypes)) {
+            throw new \InvalidArgumentException(
+                sprintf('Files of type %s are not allowed.', $mimeType)
+            );
+        }
+
+        $adapter = $this->filesystem->getAdapter();
+
+        if (!($adapter instanceof Local)) {
+            $adapter->setMetadata(
+                $filename,
+                ['contentType' => $mimeType]
+            );
+        }
+
+        $adapter->write($filename, $fileContent);
+
+        return $filename;
+    }
 
     public function generateNameByOriginal(string $originalName): string
     {
