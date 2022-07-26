@@ -39,6 +39,7 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         }
     }
 
+    // @phpstan-ignore-next-line у configs сложная структура
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
@@ -48,7 +49,8 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
         $loader->load('services.yml');
     }
 
-    protected function generateGaufretteConfig($config)
+    // @phpstan-ignore-next-line у config и возвращаемого значения сложная структура
+    protected function generateGaufretteConfig(array $config): array
     {
         $filesystems = [];
         $adapters = [];

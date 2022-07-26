@@ -4,6 +4,7 @@ namespace Intaro\FileUploaderBundle\Services;
 
 use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Adapter\Local;
+use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -12,9 +13,11 @@ class FileUploader
 {
     private Filesystem $filesystem;
     private string $path;
-    private ?array $allowedTypes;
+    /** @var array<string> */
+    private array $allowedTypes;
     private \Transliterator $translator;
 
+    /** @param array<string> $allowedTypes */
     public function __construct(
         Filesystem $filesystem,
         string $path,
@@ -23,7 +26,12 @@ class FileUploader
         $this->filesystem = $filesystem;
         $this->path = $path;
         $this->allowedTypes = $allowedTypes;
-        $this->translator = \Transliterator::create('Any-Latin;Latin-ASCII;Lower;[\u0080-\u7fff] remove');
+
+        $translator = \Transliterator::create('Any-Latin;Latin-ASCII;Lower;[\u0080-\u7fff] remove');
+        if (!$translator) {
+            throw new \RuntimeException('Failed to create Transliterator');
+        }
+        $this->translator = $translator;
     }
 
     /**
@@ -42,14 +50,14 @@ class FileUploader
 
         $adapter = $this->filesystem->getAdapter();
 
-        if (!($adapter instanceof Local)) {
+        if ($adapter instanceof MetadataSupporter) {
             $adapter->setMetadata(
                 $filename,
                 ['contentType' => $fileMimeType]
             );
         }
 
-        $adapter->write($filename, file_get_contents($file->getPathname()));
+        $adapter->write($filename, (string) file_get_contents($file->getPathname()));
 
         return $filename;
     }
@@ -68,14 +76,14 @@ class FileUploader
 
         $adapter = $this->filesystem->getAdapter();
 
-        if (!($adapter instanceof Local)) {
+        if ($adapter instanceof MetadataSupporter) {
             $adapter->setMetadata(
                 $filename,
                 ['contentType' => $fileMimeType]
             );
         }
 
-        $adapter->write($filename, file_get_contents($file->getPathname()));
+        $adapter->write($filename, (string) file_get_contents($file->getPathname()));
 
         if ($unlinkAfterUpload) {
             unlink($file->getPathname());
@@ -94,7 +102,7 @@ class FileUploader
 
         $adapter = $this->filesystem->getAdapter();
 
-        if (!($adapter instanceof Local)) {
+        if ($adapter instanceof MetadataSupporter) {
             $adapter->setMetadata(
                 $filename,
                 ['contentType' => $mimeType]
@@ -131,16 +139,16 @@ class FileUploader
         return preg_replace(
             '/\s+/',
             '-',
-            $this->translator->transliterate($originalName)
+            (string) $this->translator->transliterate($originalName)
         );
     }
 
-    public function remove($name): bool
+    public function remove(string $name): bool
     {
         return $this->filesystem->delete($name);
     }
 
-    public function getUrl($name): string
+    public function getUrl(string $name): string
     {
         return $this->getPath() . $name;
     }
@@ -188,7 +196,8 @@ class FileUploader
         return $this->path;
     }
 
-    public function getAllowedTypes(): ?array
+    /** @return array<string> */
+    public function getAllowedTypes(): array
     {
         return $this->allowedTypes;
     }

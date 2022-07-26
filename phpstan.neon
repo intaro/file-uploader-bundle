@@ -1,0 +1,13 @@
+parameters:
+    level: 7
+    phpVersion: 70400
+
+    parallel:
+        maximumNumberOfProcesses: 8
+        processTimeout: 300.0
+
+    paths:
+        - DependencyInjection
+        - Services
+
+    tmpDir: var/phpstan
