@@ -26,15 +26,17 @@ class IntaroFileUploaderExtension extends Extension implements PrependExtensionI
 
         foreach ($config['uploaders'] as $uploaderType => $uploaders) {
             foreach ($uploaders as $name => $options) {
-                $container->setDefinition("intaro.{$name}_uploader",
+                $container->setDefinition(
+                    "intaro.{$name}_uploader",
                     new Definition(
-                    '%intaro_file_uploader.class%',
-                    [
-                        new Reference("gaufrette.{$name}_filesystem"),
-                        $options['path'],
-                        $options['allowed_types'],
-                    ]
-                ));
+                        '%intaro_file_uploader.class%',
+                        [
+                            new Reference("gaufrette.{$name}_filesystem"),
+                            $options['path'],
+                            $options['allowed_types'],
+                        ]
+                    )
+                );
             }
         }
     }
