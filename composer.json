@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "keywords": ["symfony2", "file upload"],
     "license": "MIT",
-    "Description": "Symfony2 bundle which is intended to simplify file uploading",
+    "description": "Symfony2 bundle which is intended to simplify file uploading",
     "authors": [
         {
             "name": "Intaro Soft",
