@@ -14,9 +14,10 @@ class Configuration implements ConfigurationInterface
             $rootNode = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config 4.1 and older
+            // @phpstan-ignore-next-line
             $rootNode = $treeBuilder->root('intaro_file_uploader');
         }
-        
+
         $rootNode
             ->children()
                 ->arrayNode('uploaders')
@@ -56,7 +57,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $treeBuilder;
     }
