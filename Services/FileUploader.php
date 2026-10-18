@@ -2,10 +2,12 @@
 
 namespace Intaro\FileUploaderBundle\Services;
 
+use Gaufrette\Adapter;
 use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Adapter\Local;
 use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Filesystem;
+use Intaro\FileUploaderBundle\Exception\FileUploadException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -36,6 +38,7 @@ class FileUploader
 
     /**
      * @throws \InvalidArgumentException
+     * @throws FileUploadException
      */
     public function upload(UploadedFile $file): string
     {
@@ -57,11 +60,12 @@ class FileUploader
             );
         }
 
-        $adapter->write($filename, (string) file_get_contents($file->getPathname()));
+        $this->write($adapter, $filename, (string) file_get_contents($file->getPathname()));
 
         return $filename;
     }
 
+    /** @throws FileUploadException */
     public function uploadByPath(string $pathname, bool $unlinkAfterUpload = true): string
     {
         $file = new File($pathname);
@@ -83,15 +87,18 @@ class FileUploader
             );
         }
 
-        $adapter->write($filename, (string) file_get_contents($file->getPathname()));
-
-        if ($unlinkAfterUpload) {
-            unlink($file->getPathname());
+        try {
+            $this->write($adapter, $filename, (string) file_get_contents($file->getPathname()));
+        } finally {
+            if ($unlinkAfterUpload) {
+                unlink($file->getPathname());
+            }
         }
 
         return $filename;
     }
 
+    /** @throws FileUploadException */
     public function uploadByContent(string $fileContent, string $filename, string $mimeType): string
     {
         if ($this->allowedTypes && !in_array($mimeType, $this->allowedTypes)) {
@@ -109,9 +116,27 @@ class FileUploader
             );
         }
 
-        $adapter->write($filename, $fileContent);
+        $this->write($adapter, $filename, $fileContent);
 
         return $filename;
+    }
+
+    /** @throws FileUploadException */
+    private function write(Adapter $adapter, string $filename, string $fileContent): void
+    {
+        try {
+            $result = $adapter->write($filename, $fileContent);
+        } catch (\Throwable $exception) {
+            throw new FileUploadException(
+                sprintf('Could not upload the "%s" file.', $filename),
+                0,
+                $exception
+            );
+        }
+
+        if (false === $result) {
+            throw new FileUploadException(sprintf('Could not upload the "%s" file.', $filename));
+        }
     }
 
     public function generateNameByOriginal(string $originalName): string
