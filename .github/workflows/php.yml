@@ -40,5 +40,7 @@ jobs:
       run: vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --dry-run DependencyInjection
     - name: PHP CS fix Services
       run: vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --dry-run Services
+    - name: PHP CS fix Exception
+      run: vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --dry-run Exception
     - name: phpstan
       run: vendor/bin/phpstan analyse --ansi --memory-limit=1800M --no-progress --error-format=github
